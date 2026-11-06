@@ -1,0 +1,35 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"Arial","fontSize":"15px","primaryColor":"#EAF1FB","primaryBorderColor":"#2B5DA8","lineColor":"#5A6B7F"}}}%%
+flowchart TD
+  root["Tenant Root Group"]
+  plat["mg-platform<br/>(empty, for future platform services)"]
+  lz["mg-landingzones<br/><b>Defines</b> init-landing-zone-baseline"]
+  dev["mg-lz-dev<br/><b>Assigned here:</b><br/>init-landing-zone-baseline (Deny / Audit)<br/>inherit-tag-cost-center (Modify)"]
+  prod["mg-lz-prod<br/>(no assignments yet)"]
+  sub["Azure subscription 1"]
+  gov["rg-governance-dev-eus-001<br/>tags: owner, environment, cost-center"]
+  bud["Budget: $25 / month<br/>alerts at 50%, 80%, 100% actual + 100% forecast"]
+  cost["Cost analysis view<br/>cost-by-tag, tag inheritance on"]
+
+  root --> plat
+  root --> lz
+  lz --> dev
+  lz --> prod
+  dev --> sub
+  sub --> gov
+  sub --> bud
+  bud --> cost
+
+  pol["<b>Guardrails in the initiative</b><br/>Require tags: owner, environment, cost-center (Deny)<br/>Require cost-center on resource groups (Deny)<br/>Allowed locations: eastus, eastus2 (Deny)<br/>No public IPs on NICs (Deny)<br/>HTTPS for storage (Audit)"]
+  dev -.- pol
+
+  tf["Terraform in /iac<br/>manages all groups, policies,<br/>role, budget and resource group"]
+  tf -.-> lz
+
+  classDef mg fill:#EAF1FB,stroke:#2B5DA8,stroke-width:1.5px,color:#102A4C;
+  classDef res fill:#EEF7EE,stroke:#3C8D40,stroke-width:1.5px,color:#14351A;
+  classDef note fill:#FFF8E6,stroke:#C99A2E,stroke-width:1.5px,color:#4A3500;
+  classDef code fill:#F3EEFA,stroke:#7B4FB8,stroke-width:1.5px,color:#2E1A4F;
+  class root,plat,lz,dev,prod mg;
+  class sub,gov,bud,cost res;
+  class pol note;
+  class tf code;
